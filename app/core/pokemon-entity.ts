@@ -1478,6 +1478,33 @@ export class PokemonEntity extends Schema implements IPokemonEntity {
     }
   }
 
+  getStat(stat: Stat): number {
+    switch (stat) {
+      case Stat.ATK:
+        return this.atk
+      case Stat.DEF:
+        return this.def
+      case Stat.SPE_DEF:
+        return this.speDef
+      case Stat.AP:
+        return this.ap
+      case Stat.PP:
+        return this.pp
+      case Stat.ATK_SPEED:
+        return this.atkSpeed
+      case Stat.CRIT_CHANCE:
+        return this.critChance
+      case Stat.CRIT_POWER:
+        return this.critPower
+      case Stat.SHIELD:
+        return this.shield
+      case Stat.HP:
+        return this.hp
+      default:
+        return 0
+    }
+  }
+
   resurrect() {
     const cloneForStatsReference = PokemonFactory.createPokemonFromName(
       this.name
@@ -1660,6 +1687,18 @@ export class PokemonEntity extends Schema implements IPokemonEntity {
       this.player.items.push(Item.BERRY_JUICE)
     }
   }
+}
+
+export function getHighestStat(pokemons: PokemonEntity[], stat: Stat): PokemonEntity | undefined {
+  if (pokemons.length == 0) { return undefined }
+    
+  return pokemons.reduce((highestStat, currentPokemon) => {
+    if (highestStat.getStat(stat) > currentPokemon.getStat(stat)) { 
+      return highestStat as PokemonEntity 
+    } else {
+      return currentPokemon as PokemonEntity
+    } 
+  })
 }
 
 export function getStrongestUnit(pokemons: PokemonEntity[]): PokemonEntity {

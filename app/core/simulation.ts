@@ -37,7 +37,7 @@ import { pickRandomIn, randomBetween, shuffleArray } from "../utils/random"
 import { values } from "../utils/schemas"
 import Board from "./board"
 import Dps from "./dps"
-import { PokemonEntity, getStrongestUnit, getUnitScore } from "./pokemon-entity"
+import { PokemonEntity, getStrongestUnit, getUnitScore, getHighestStat } from "./pokemon-entity"
 
 export default class Simulation extends Schema implements ISimulation {
   @type("string") weather: Weather = Weather.NEUTRAL
@@ -1528,14 +1528,8 @@ export default class Simulation extends Schema implements ISimulation {
     ) as PokemonEntity[]
 
     if (effect === Effect.CURSE_OF_VULNERABILITY) {
-      let enemyWithHighestDef: PokemonEntity | undefined = undefined
-      let highestDef = 0
-      opponentsCursable.forEach((enemy) => {
-        if (enemy.def + enemy.speDef > highestDef) {
-          highestDef = enemy.def + enemy.speDef
-          enemyWithHighestDef = enemy as PokemonEntity
-        }
-      })
+      let enemyWithHighestDef: PokemonEntity | undefined = getHighestStat(opponentsCursable, Stat.DEF)
+
       if (enemyWithHighestDef) {
         enemyWithHighestDef = enemyWithHighestDef as PokemonEntity // see https://github.com/microsoft/TypeScript/issues/11498
         enemyWithHighestDef.addDefense(-5, enemyWithHighestDef, 0, false)
@@ -1550,14 +1544,7 @@ export default class Simulation extends Schema implements ISimulation {
     }
 
     if (effect === Effect.CURSE_OF_WEAKNESS) {
-      let enemyWithHighestAtk: PokemonEntity | undefined = undefined
-      let highestATK = 0
-      opponentsCursable.forEach((enemy) => {
-        if (enemy.atk > highestATK) {
-          highestATK = enemy.atk
-          enemyWithHighestAtk = enemy as PokemonEntity
-        }
-      })
+      let enemyWithHighestAtk: PokemonEntity | undefined = getHighestStat(opponentsCursable, Stat.ATK)
       if (enemyWithHighestAtk) {
         enemyWithHighestAtk = enemyWithHighestAtk as PokemonEntity // see https://github.com/microsoft/TypeScript/issues/11498
         enemyWithHighestAtk.addAttack(
@@ -1572,14 +1559,8 @@ export default class Simulation extends Schema implements ISimulation {
     }
 
     if (effect === Effect.CURSE_OF_TORMENT) {
-      let enemyWithHighestAP: PokemonEntity | undefined = undefined
-      let highestAP = 0
-      opponentsCursable.forEach((enemy) => {
-        if (enemy.ap >= highestAP) {
-          highestAP = enemy.ap
-          enemyWithHighestAP = enemy as PokemonEntity
-        }
-      })
+      let enemyWithHighestAP: PokemonEntity | undefined = getHighestStat(opponentsCursable, Stat.AP)
+
       if (enemyWithHighestAP) {
         enemyWithHighestAP = enemyWithHighestAP as PokemonEntity // see https://github.com/microsoft/TypeScript/issues/11498
         enemyWithHighestAP.addAbilityPower(-50, enemyWithHighestAP, 0, false)
